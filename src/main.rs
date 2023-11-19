@@ -4,6 +4,7 @@ use std::{
     process,
 };
 
+// 4.1 - The Interpreter Framework 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
@@ -18,8 +19,11 @@ fn main() {
 }
 
 fn run_file(path: String) {
-    let file_content = std::fs::read_to_string(path).unwrap(); // No error handling needed... 😛
+    let file_content = std::fs::read_to_string(path).unwrap();
     run(file_content);
+
+    // Indicate an error in the exit code.
+    // if (hadError) System.exit(65);
 }
 
 fn run_prompt() {
@@ -41,6 +45,7 @@ fn run_prompt() {
         }
 
         run(line.unwrap().unwrap());
+        //hadError = false;
     }
 }
 
@@ -72,4 +77,18 @@ impl Scanner {
     fn scan_tokens(&self) -> Vec<Token> {
         Vec::new()
     }
+}
+
+/// 4.1.1 - Error handling
+#[allow(dead_code)]
+fn error(line: usize, message: String) {
+    report(line, "".into(), message);
+}
+
+fn report(line: usize, r#where: String, message: String) {
+    eprintln!("[line {line}] Error {where}: {message}");
+
+    // I'll come back to this when I can see how it's
+    // supposed to be used, as this is not Rusty at all. :(
+    // hadError = true; 
 }
