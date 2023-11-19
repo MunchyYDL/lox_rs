@@ -1,17 +1,22 @@
 #![allow(dead_code)]
 
-use std::fmt::{Display, self};
+use std::fmt::{self, Display};
 
 #[derive(Debug, Clone)]
 pub struct Token {
     token_type: TokenType,
     lexeme: String,
-    literal: String,  // FIXME: Type is Object in the Java source, don't know what this will be yet
+    literal: Option<String>, // FIXME: Type is Object in the Java source, don't know what this will be yet
     line: usize,
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, lexeme: String, literal: String, line: usize) -> Self {
+    pub fn new(
+        token_type: TokenType,
+        lexeme: String,
+        literal: Option<String>,
+        line: usize,
+    ) -> Self {
         Token {
             token_type,
             lexeme,
@@ -25,7 +30,7 @@ impl Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "{:?} {} {}",
+            "{:?} {} {:?}",
             self.token_type, self.lexeme, self.literal
         )
     }

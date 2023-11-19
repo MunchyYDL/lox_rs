@@ -31,7 +31,7 @@ impl Scanner {
         }
 
         // End with a Eof token
-        let token = Token::new(TokenType::Eof, "".into(), "".into(), 1);
+        let token = Token::new(TokenType::Eof, "".into(), None, 1);
         self.tokens.push(token);
         self.tokens.clone()
     }
@@ -41,6 +41,35 @@ impl Scanner {
     }
 
     fn scan_token(&mut self) {
-        todo!()
+      let c = self.advance();
+      match c {
+        '(' => self.add_token(TokenType::LeftParen),
+        ')' => self.add_token(TokenType::RightParen),
+        '{' => self.add_token(TokenType::LeftBrace),
+        '}' => self.add_token(TokenType::RightBrace),
+        ',' => self.add_token(TokenType::Comma),
+        '.' => self.add_token(TokenType::Dot),
+        '-' => self.add_token(TokenType::Minus),
+        '+' => self.add_token(TokenType::Plus),
+        ';' => self.add_token(TokenType::Semicolon),
+        '*' => self.add_token(TokenType::Star),
+        _ => eprintln!("Missing token: {c}")
+      }
     }
-}
+
+    fn advance(&mut self) -> char {
+      let c = self.source.chars().nth(self.current);
+      self.current += 1;
+      c.unwrap()
+    }
+
+    fn add_token(&mut self, token_type: TokenType) {
+      self.add_token_object(token_type, None)
+    }
+
+    fn add_token_object(&mut self, token_type: TokenType, literal: Option<String>) {
+      let text = &self.source[self.start..self.current];
+      let token = Token::new(token_type, text.into(), literal, self.line);
+      self.tokens.push(token);
+    }
+  }
