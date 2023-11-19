@@ -2,7 +2,7 @@
 
 use std::fmt::{Display, self};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     token_type: TokenType,
     lexeme: String,
@@ -11,7 +11,7 @@ pub struct Token {
 }
 
 impl Token {
-    fn new(token_type: TokenType, lexeme: String, literal: String, line: usize) -> Self {
+    pub fn new(token_type: TokenType, lexeme: String, literal: String, line: usize) -> Self {
         Token {
             token_type,
             lexeme,
@@ -31,8 +31,8 @@ impl Display for Token {
     }
 }
 
-#[derive(Debug)]
-enum TokenType {
+#[derive(Debug, Clone)]
+pub enum TokenType {
     // Single-character tokens.
     LeftParen,
     RightParen,
