@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::scanner::Scanner;
 use std::{
     env,
@@ -64,9 +66,6 @@ fn run(source: String) {
     }
 }
 
-
-/// 4.1.1 - Error handling
-#[allow(dead_code)]
 fn error(line: usize, message: String) {
     report(line, "".into(), message);
 }

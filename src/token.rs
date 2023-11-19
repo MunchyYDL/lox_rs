@@ -1,11 +1,12 @@
-// 4.2 - Lexemes and Tokens
 #![allow(dead_code)]
+
+use std::fmt::{Display, self};
 
 #[derive(Debug)]
 pub struct Token {
     token_type: TokenType,
     lexeme: String,
-    literal: String,
+    literal: String,  // FIXME: Type is Object in the Java source, don't know what this will be yet
     line: usize,
 }
 
@@ -18,65 +19,65 @@ impl Token {
             line,
         }
     }
+}
 
-    #[allow(clippy::inherent_to_string)]
-    fn to_string(&self) -> String {
-        format!("{:?} {:?} {:?}", self.token_type, self.lexeme, self.literal)
+impl Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{:?} {} {}",
+            self.token_type, self.lexeme, self.literal
+        )
     }
 }
 
-// FIXME: Non Rusty code...
-
-// https://doc.rust-lang.org/rustc/?search=non_camel_case_types
-// https://rust-lang.github.io/rust-clippy/master/index.html#/upper_case_acronyms
-#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 #[derive(Debug)]
 enum TokenType {
     // Single-character tokens.
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    LEFT_BRACE,
-    RIGHT_BRACE,
-    COMMA,
-    DOT,
-    MINUS,
-    PLUS,
-    SEMICOLON,
-    SLASH,
-    STAR,
+    LeftParen,
+    RightParen,
+    LeftBrace,
+    RightBrace,
+    Comma,
+    Dot,
+    Minus,
+    Plus,
+    Semicolon,
+    Slash,
+    Star,
 
     // One or two character tokens.
-    BANG,
-    BANG_EQUAL,
-    EQUAL,
-    EQUAL_EQUAL,
-    GREATER,
-    GREATER_EQUAL,
-    LESS,
-    LESS_EQUAL,
+    Bang,
+    BangEqual,
+    Equal,
+    EqualEqual,
+    Greater,
+    GreaterEqual,
+    Less,
+    LessEqual,
 
     // Literals.
-    IDENTIFIER,
-    STRING,
-    NUMBER,
+    Identifier,
+    String,
+    Number,
 
     // Keywords.
-    AND,
-    CLASS,
-    ELSE,
-    FALSE,
-    FUN,
-    FOR,
-    IF,
-    NIL,
-    OR,
-    PRINT,
-    RETURN,
-    SUPER,
-    THIS,
-    TRUE,
-    VAR,
-    WHILE,
+    And,
+    Class,
+    Else,
+    False,
+    Fun,
+    For,
+    If,
+    Nil,
+    Or,
+    Print,
+    Return,
+    Super,
+    This,
+    True,
+    Var,
+    While,
 
-    EOF,
+    Eof,
 }
