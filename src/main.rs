@@ -1,19 +1,20 @@
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() > 1 {
-        println!("Usage: lox [script]");
-    } else if args.len() == 1 {
-        run_file(args[0].clone());
-    } else {
-        run_prompt();
+
+    match args.len() {
+        2 => run_file(args[1].clone()),
+        1 => run_prompt(),
+        _ => {
+            println!("Usage: lox [script]");
+            std::process::exit(64);
+        }
     }
 }
 
+fn run_file(path: String) {
+    println!("run_file: {path}");
+}
+
 fn run_prompt() {
-    todo!()
+    println!("run_prompt");
 }
-
-fn run_file(_args: String) {
-    todo!()
-}
-
