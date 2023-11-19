@@ -41,35 +41,79 @@ impl Scanner {
     }
 
     fn scan_token(&mut self) {
-      let c = self.advance();
-      match c {
-        '(' => self.add_token(TokenType::LeftParen),
-        ')' => self.add_token(TokenType::RightParen),
-        '{' => self.add_token(TokenType::LeftBrace),
-        '}' => self.add_token(TokenType::RightBrace),
-        ',' => self.add_token(TokenType::Comma),
-        '.' => self.add_token(TokenType::Dot),
-        '-' => self.add_token(TokenType::Minus),
-        '+' => self.add_token(TokenType::Plus),
-        ';' => self.add_token(TokenType::Semicolon),
-        '*' => self.add_token(TokenType::Star),
-        _ => crate::error(self.line, "Unexpected character.".into())
-      }
+        let c = self.advance();
+        match c {
+            // Single-character tokens.
+            '(' => self.add_token(TokenType::LeftParen),
+            ')' => self.add_token(TokenType::RightParen),
+            '{' => self.add_token(TokenType::LeftBrace),
+            '}' => self.add_token(TokenType::RightBrace),
+            ',' => self.add_token(TokenType::Comma),
+            '.' => self.add_token(TokenType::Dot),
+            '-' => self.add_token(TokenType::Minus),
+            '+' => self.add_token(TokenType::Plus),
+            ';' => self.add_token(TokenType::Semicolon),
+            '*' => self.add_token(TokenType::Star),
+
+            // One or two character tokens.
+            '!' => {
+                if self.next_matches('=') {
+                    self.add_token(TokenType::BangEqual)
+                } else {
+                    self.add_token(TokenType::Bang)
+                }
+            }
+            '=' => {
+                if self.next_matches('=') {
+                    self.add_token(TokenType::EqualEqual)
+                } else {
+                    self.add_token(TokenType::Equal)
+                }
+            }
+            '<' => {
+                if self.next_matches('=') {
+                    self.add_token(TokenType::LessEqual)
+                } else {
+                    self.add_token(TokenType::Less)
+                }
+            }
+            '>' => {
+                if self.next_matches('=') {
+                    self.add_token(TokenType::GreaterEqual)
+                } else {
+                    self.add_token(TokenType::Greater)
+                }
+            }
+
+            _ => crate::error(self.line, "Unexpected character.".into()),
+        }
     }
 
     fn advance(&mut self) -> char {
-      let c = self.source.chars().nth(self.current);
-      self.current += 1;
-      c.unwrap()
+        let c = self.source.chars().nth(self.current).unwrap();
+        self.current += 1;
+        c
+    }
+
+    fn next_matches(&mut self, expected: char) -> bool {
+        if self.is_at_end() {
+            return false;
+        };
+        if self.source.chars().nth(self.current).unwrap() != expected {
+            return false;
+        }
+
+        self.current += 1;
+        true
     }
 
     fn add_token(&mut self, token_type: TokenType) {
-      self.add_token_object(token_type, None)
+        self.add_token_object(token_type, None)
     }
 
     fn add_token_object(&mut self, token_type: TokenType, literal: Option<String>) {
-      let text = &self.source[self.start..self.current];
-      let token = Token::new(token_type, text.into(), literal, self.line);
-      self.tokens.push(token);
+        let text = &self.source[self.start..self.current];
+        let token = Token::new(token_type, text.into(), literal, self.line);
+        self.tokens.push(token);
     }
-  }
+}
