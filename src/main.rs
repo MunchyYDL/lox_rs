@@ -44,6 +44,32 @@ fn run_prompt() {
     }
 }
 
-fn run(content: String) {
-    println!("run:\n{content}\n");
+fn run(source: String) {
+    println!("run:\n{source}\n");
+
+    let scanner = Scanner::new(source);
+    let tokens = scanner.scan_tokens();
+
+    // For now, just print the tokens.
+    for token in tokens {
+        println!("{token:?}");
+    }
+}
+
+#[allow(dead_code)]
+struct Scanner {
+    source: String,
+}
+
+#[derive(Debug)]
+struct Token {}
+
+impl Scanner {
+    fn new(source: String) -> Self {
+        Scanner { source }
+    }
+
+    fn scan_tokens(&self) -> Vec<Token> {
+        Vec::new()
+    }
 }
