@@ -55,10 +55,13 @@ fn run_prompt() {
 }
 
 fn run(source: String) {
-    println!("run:\n{source}\n");
-
+    println!("Scanning:\n{source}\n");
     let mut scanner = Scanner::new(source);
     let tokens = scanner.scan_tokens();
+
+    // Here we need to know if there were any errors reported,
+    // to decide if we want to execute the code or not.
+    println!("Executing...\n");
 
     // For now, just print the tokens.
     for token in tokens {

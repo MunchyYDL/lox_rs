@@ -53,7 +53,7 @@ impl Scanner {
         '+' => self.add_token(TokenType::Plus),
         ';' => self.add_token(TokenType::Semicolon),
         '*' => self.add_token(TokenType::Star),
-        _ => eprintln!("Missing token: {c}")
+        _ => crate::error(self.line, "Unexpected character.".into())
       }
     }
 
