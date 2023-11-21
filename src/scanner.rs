@@ -31,12 +31,12 @@ impl Scanner {
         }
 
         // End with a Eof token
-        let token = Token::new(TokenType::Eof, "".into(), None, 1);
+        let token = Token::new(TokenType::Eof, "".into(), None, self.line);
         self.tokens.push(token);
         self.tokens.clone()
     }
 
-    fn is_at_end(&mut self) -> bool {
+    fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
 
@@ -189,14 +189,14 @@ impl Scanner {
         true
     }
 
-    fn peek(&mut self) -> char {
+    fn peek(&self) -> char {
         if self.is_at_end() {
             return '\0';
         }
         self.source.chars().nth(self.current).unwrap()
     }
 
-    fn peek_next(&mut self) -> char {
+    fn peek_next(&self) -> char {
         if self.current + 1 >= self.source.len() {
             return '\0';
         }
