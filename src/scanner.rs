@@ -84,6 +84,18 @@ impl Scanner {
                     self.add_token(TokenType::Greater)
                 }
             }
+            '/' => {
+                if self.next_matches('/') {
+                    // A comment goes until the end of the line, but brings no
+                    // value to the evaluation of the program, so it doesn't
+                    // add anything to the list of tokens.
+                    while self.peek() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
+                } else {
+                    self.add_token(TokenType::Slash);
+                }
+            }
 
             _ => crate::error(self.line, "Unexpected character.".into()),
         }
@@ -105,6 +117,13 @@ impl Scanner {
 
         self.current += 1;
         true
+    }
+
+    fn peek(&mut self) -> char {
+        if self.is_at_end() {
+            return '\0';
+        }
+        self.source.chars().nth(self.current).unwrap()
     }
 
     fn add_token(&mut self, token_type: TokenType) {
