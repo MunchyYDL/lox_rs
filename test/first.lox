@@ -8,3 +8,6 @@
 
 "A string that spans
 multiple lines."
+
+123 // A number
+321.432 // A decimal number

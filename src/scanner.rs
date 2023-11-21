@@ -108,12 +108,54 @@ impl Scanner {
             // String
             '"' => self.string(),
 
-            // Output the unexpected character
-            x => crate::error(
-                self.line,
-                format!("Unexpected character: '{:#x}'.", x as u32),
-            ),
+            // Default
+            x => {
+                if self.is_digit(x) {
+                    self.number();
+                }
+
+                // If we reach this, we have gotten something unexpected
+                crate::error(
+                    self.line,
+                    format!("Unexpected character: '{:#x}'.", x as u32),
+                );
+            }
         }
+    }
+
+    fn is_digit(&mut self, c: char) -> bool {
+        return c >= '0' && c <= '9';
+    }
+
+    fn number(&mut self) {
+        let mut d = self.peek();
+        while self.is_digit(d) {
+            self.advance();
+            d = self.peek();
+        }
+
+        // Look for fractional part
+        d = self.peek_next();
+        if self.peek() == '.' && self.is_digit(d) {
+            // Consume the .
+            self.advance();
+
+            d = self.peek();
+            while self.is_digit(d) {
+                self.advance();
+                d = self.peek();
+            }
+        }
+
+        // Read the value from the source & convert it
+        let value = &self.source[self.start..self.current];
+        let number = value.parse::<f32>().unwrap();
+
+        // Our current implementation only allows Option<String> to be passed here,
+        // so I'll convert it back to a string to let it pass for now.
+
+        // FIXME: Add support for both string and number literals!
+        self.add_token_object(TokenType::Number, Some(number.to_string()));
     }
 
     fn string(&mut self) {
@@ -161,6 +203,13 @@ impl Scanner {
             return '\0';
         }
         self.source.chars().nth(self.current).unwrap()
+    }
+
+    fn peek_next(&mut self) -> char {
+        if self.current + 1 >= self.source.len() {
+            return '\0';
+        }
+        self.source.chars().nth(self.current + 1).unwrap()
     }
 
     fn add_token(&mut self, token_type: TokenType) {
