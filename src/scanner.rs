@@ -97,7 +97,17 @@ impl Scanner {
                 }
             }
 
-            _ => crate::error(self.line, "Unexpected character.".into()),
+            // Ignore whitespace
+            ' ' | '\r' | '\t' => {}
+
+            // Line breaks
+            '\n' => self.line += 1,
+
+            // Output the unexpected character
+            x => crate::error(
+                self.line,
+                format!("Unexpected character: '{}'.", x.to_ascii_lowercase()),
+            ),
         }
     }
 
