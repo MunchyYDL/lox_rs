@@ -3,3 +3,8 @@
 
 (( )){} // grouping stuff
 !*+-/=<> <= == // operators
+
+"A string literal" // A string
+
+"A string that spans
+multiple lines."

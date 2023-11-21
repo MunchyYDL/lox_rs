@@ -84,11 +84,13 @@ impl Scanner {
                     self.add_token(TokenType::Greater)
                 }
             }
+
+            // Comment or single slash
             '/' => {
                 if self.next_matches('/') {
                     // A comment goes until the end of the line, but brings no
                     // value to the evaluation of the program, so it doesn't
-                    // add anything to the list of tokens.
+                    // add anything to the list of found/scanned tokens.
                     while self.peek() != '\n' && !self.is_at_end() {
                         self.advance();
                     }
@@ -103,12 +105,37 @@ impl Scanner {
             // Line breaks
             '\n' => self.line += 1,
 
+            // String
+            '"' => self.string(),
+
             // Output the unexpected character
             x => crate::error(
                 self.line,
-                format!("Unexpected character: '{}'.", x.to_ascii_lowercase()),
+                format!("Unexpected character: '{:#x}'.", x as u32),
             ),
         }
+    }
+
+    fn string(&mut self) {
+        // Try to find the terminating " of the string
+        while self.peek() != '"' && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1;
+            }
+            self.advance();
+        }
+
+        if self.is_at_end() {
+            crate::error(self.line, "Unterminated string.".into());
+            return;
+        }
+
+        // Consume the closing "
+        self.advance();
+
+        // Trim the surrounding quotes
+        let value = &self.source[self.start + 1..self.current - 1];
+        self.add_token_object(TokenType::String, Some(value.into()));
     }
 
     fn advance(&mut self) -> char {
