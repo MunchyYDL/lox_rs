@@ -110,7 +110,7 @@ impl Scanner {
 
             // Default
             x => {
-                if self.is_digit(x) {
+                if x.is_ascii_digit() {
                     self.number();
                 }
 
@@ -123,27 +123,18 @@ impl Scanner {
         }
     }
 
-    fn is_digit(&mut self, c: char) -> bool {
-        return c >= '0' && c <= '9';
-    }
-
     fn number(&mut self) {
-        let mut d = self.peek();
-        while self.is_digit(d) {
+        while self.peek().is_ascii_digit() {
             self.advance();
-            d = self.peek();
         }
 
         // Look for fractional part
-        d = self.peek_next();
-        if self.peek() == '.' && self.is_digit(d) {
+        if self.peek() == '.' && self.peek_next().is_ascii_digit() {
             // Consume the .
             self.advance();
 
-            d = self.peek();
-            while self.is_digit(d) {
+            while self.peek().is_ascii_digit() {
                 self.advance();
-                d = self.peek();
             }
         }
 
