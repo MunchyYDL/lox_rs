@@ -37,6 +37,11 @@ pub struct Scanner {
 }
 
 impl Scanner {
+
+    /*
+     * Public methods - Creating a Scanner and staring a scan for tokens
+     */
+
     pub fn new(source: String) -> Self {
         Scanner {
             source,
@@ -62,10 +67,11 @@ impl Scanner {
         self.tokens.clone()
     }
 
-    fn is_at_end(&self) -> bool {
-        self.current >= self.source.len()
-    }
+    /*
+     * Private methods - All the implementation details of how the scanning is done
+     */
 
+    /// This method looks at the next char in the source, and takes decisions based on that
     fn scan_token(&mut self) {
         let c = self.advance();
         match c {
@@ -150,13 +156,9 @@ impl Scanner {
         }
     }
 
-    fn is_alpha(&self, c: char) -> bool {
-        (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
-    }
-
-    fn is_alpha_numeric(&self, c: char) -> bool {
-        self.is_alpha(c) || c.is_ascii_digit()
-    }
+    /*
+     * The large classification scanners, identifier, number and string
+     */
 
     fn identifier(&mut self) {
         let mut d = self.peek();
@@ -219,10 +221,12 @@ impl Scanner {
         let text = &self.get_text();
         let text = &text[1..text.len() - 1];
 
-        dbg!(text);
-
         self.add_token_object(TokenType::String, Some(text.into()));
     }
+
+    /*
+     * Small helpers for the scanning
+     */
 
     fn advance(&mut self) -> char {
         let c = self.get_char();
@@ -242,6 +246,33 @@ impl Scanner {
         true
     }
 
+
+    /*
+     * Small helpers to classify if the current char is alpha or alpha-numeric
+     */
+
+    fn is_alpha(&self, c: char) -> bool {
+        (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+    }
+
+    fn is_alpha_numeric(&self, c: char) -> bool {
+        self.is_alpha(c) || c.is_ascii_digit()
+    }
+
+
+    /*
+     * Checking that we don't pass the end of the source
+     */
+
+    fn is_at_end(&self) -> bool {
+        self.current >= self.source.len()
+    }
+   
+
+    /*
+     * Peeking at characters in the source
+     */
+
     fn peek(&self) -> char {
         if self.is_at_end() {
             return ZERO_TERMINATED;
@@ -255,6 +286,11 @@ impl Scanner {
         }
         self.get_next_char()
     }
+
+
+    /*
+     * Getting chars or text from the source
+     */
 
     // Return the char from self.source at self.current
     fn get_char(&self) -> char {
@@ -270,6 +306,11 @@ impl Scanner {
     fn get_text(&self) -> String {
         self.source[self.start..self.current].into()
     }
+
+
+    /* 
+     * Adding tokens
+     */
 
     fn add_token(&mut self, token_type: TokenType) {
         self.add_token_object(token_type, None)
