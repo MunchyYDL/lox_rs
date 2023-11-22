@@ -5,6 +5,8 @@ use std::collections::HashMap;
 
 use crate::token::{Token, TokenType};
 
+static ZERO_TERMINATED: char = '\0';
+
 lazy_static! {
     static ref KEYWORDS: HashMap<&'static str, TokenType> = HashMap::from([
         ("and", TokenType::And),
@@ -163,8 +165,10 @@ impl Scanner {
             d = self.peek();
         }
 
-        let text = &self.source[self.start..self.current];
-        let token_type = KEYWORDS.get(text).unwrap_or(&TokenType::Identifier);
+        let text = self.get_text();
+        let token_type = KEYWORDS
+            .get(text.as_str())
+            .unwrap_or(&TokenType::Identifier);
         self.add_token(token_type.clone());
     }
 
@@ -184,8 +188,8 @@ impl Scanner {
         }
 
         // Read the value from the source & convert it
-        let value = &self.source[self.start..self.current];
-        let number = value.parse::<f32>().unwrap();
+        let text = self.get_text();
+        let number = text.parse::<f32>().unwrap();
 
         // Our current implementation only allows Option<String> to be passed here,
         // so I'll convert it back to a string to let it pass for now.
@@ -211,13 +215,17 @@ impl Scanner {
         // Consume the closing "
         self.advance();
 
-        // Trim the surrounding quotes
-        let value = &self.source[self.start + 1..self.current - 1];
-        self.add_token_object(TokenType::String, Some(value.into()));
+        // Get the text & trim the surrounding quotes
+        let text = &self.get_text();
+        let text = &text[1..text.len() - 1];
+
+        dbg!(text);
+
+        self.add_token_object(TokenType::String, Some(text.into()));
     }
 
     fn advance(&mut self) -> char {
-        let c = self.source.chars().nth(self.current).unwrap();
+        let c = self.get_char();
         self.current += 1;
         c
     }
@@ -226,7 +234,7 @@ impl Scanner {
         if self.is_at_end() {
             return false;
         };
-        if self.source.chars().nth(self.current).unwrap() != expected {
+        if self.get_char() != expected {
             return false;
         }
 
@@ -236,16 +244,31 @@ impl Scanner {
 
     fn peek(&self) -> char {
         if self.is_at_end() {
-            return '\0';
+            return ZERO_TERMINATED;
         }
-        self.source.chars().nth(self.current).unwrap()
+        self.get_char()
     }
 
     fn peek_next(&self) -> char {
         if self.current + 1 >= self.source.len() {
-            return '\0';
+            return ZERO_TERMINATED;
         }
+        self.get_next_char()
+    }
+
+    // Return the char from self.source at self.current
+    fn get_char(&self) -> char {
+        self.source.chars().nth(self.current).unwrap()
+    }
+
+    // Return the char from self.source at self.current + 1
+    fn get_next_char(&self) -> char {
         self.source.chars().nth(self.current + 1).unwrap()
+    }
+
+    /// Returns the String from self.source between self.start and self.current
+    fn get_text(&self) -> String {
+        self.source[self.start..self.current].into()
     }
 
     fn add_token(&mut self, token_type: TokenType) {
@@ -253,8 +276,8 @@ impl Scanner {
     }
 
     fn add_token_object(&mut self, token_type: TokenType, literal: Option<String>) {
-        let text = &self.source[self.start..self.current];
-        let token = Token::new(token_type, text.into(), literal, self.line);
+        let text = self.get_text();
+        let token = Token::new(token_type, text, literal, self.line);
         self.tokens.push(token);
     }
 }
