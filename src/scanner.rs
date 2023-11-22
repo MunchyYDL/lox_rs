@@ -1,6 +1,30 @@
 #![allow(dead_code)]
 
+use lazy_static::*;
+use std::collections::HashMap;
+
 use crate::token::{Token, TokenType};
+
+lazy_static! {
+    static ref KEYWORDS: HashMap<&'static str, TokenType> = HashMap::from([
+        ("and", TokenType::And),
+        ("class", TokenType::Class),
+        ("else", TokenType::Else),
+        ("false", TokenType::False),
+        ("for", TokenType::For),
+        ("fun", TokenType::Fun),
+        ("if", TokenType::If),
+        ("nil", TokenType::Nil),
+        ("or", TokenType::Or),
+        ("print", TokenType::Print),
+        ("return", TokenType::Return),
+        ("super", TokenType::Super),
+        ("this", TokenType::This),
+        ("true", TokenType::True),
+        ("var", TokenType::Var),
+        ("while", TokenType::While)
+    ]);
+}
 
 pub struct Scanner {
     source: String,
@@ -112,6 +136,8 @@ impl Scanner {
             x => {
                 if x.is_ascii_digit() {
                     self.number();
+                } else if self.is_alpha(c) {
+                    self.identifier();
                 }
 
                 // If we reach this, we have gotten something unexpected
@@ -121,6 +147,26 @@ impl Scanner {
                 );
             }
         }
+    }
+
+    fn is_alpha(&self, c: char) -> bool {
+        (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+    }
+
+    fn is_alpha_numeric(&self, c: char) -> bool {
+        self.is_alpha(c) || c.is_ascii_digit()
+    }
+
+    fn identifier(&mut self) {
+        let mut d = self.peek();
+        while self.is_alpha_numeric(d) {
+            self.advance();
+            d = self.peek();
+        }
+
+        let text = &self.source[self.start..self.current];
+        let token_type = KEYWORDS.get(text).unwrap_or(&TokenType::Identifier);
+        self.add_token(token_type.clone());
     }
 
     fn number(&mut self) {

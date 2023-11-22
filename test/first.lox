@@ -11,3 +11,6 @@ multiple lines."
 
 123 // A number
 321.432 // A decimal number
+
+var a = 34
+var does_this_work = true or false;
