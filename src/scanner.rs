@@ -3,7 +3,7 @@
 use lazy_static::*;
 use std::collections::HashMap;
 
-use crate::token::{Token, TokenType};
+use crate::token::{Token, TokenType, self};
 
 static ZERO_TERMINATED: char = '\0';
 
@@ -62,8 +62,9 @@ impl Scanner {
         }
 
         // End with a Eof token
-        let token = Token::new(TokenType::Eof, "".into(), None, self.line);
-        self.tokens.push(token);
+        self.add_token(TokenType::Eof);
+
+        // Return the list of tokens
         self.tokens.clone()
     }
 
