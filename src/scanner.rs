@@ -132,18 +132,17 @@ impl Scanner {
             // String
             '"' => self.string(),
 
-            // Default
-            x => {
-                if x.is_ascii_digit() {
-                    self.number();
-                } else if self.is_alpha(c) {
-                    self.identifier();
-                }
+            // Number
+            c if c.is_ascii_digit() => self.number(),
 
-                // If we reach this, we have gotten something unexpected
+            // Identifier or Keyword - Have to start with character or _
+            c if self.is_alpha(c) => self.identifier(),
+
+            // Default - If we reach this, we have gotten something unexpected
+            c => {
                 crate::error(
                     self.line,
-                    format!("Unexpected character: '{:#x}'.", x as u32),
+                    format!("Unexpected character code: '{:#x}'.", c as u32),
                 );
             }
         }
