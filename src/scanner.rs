@@ -3,7 +3,7 @@
 use lazy_static::*;
 use std::collections::HashMap;
 
-use crate::token::{Token, TokenType, self};
+use crate::token::{Token, TokenType};
 
 static ZERO_TERMINATED: char = '\0';
 
@@ -37,7 +37,6 @@ pub struct Scanner {
 }
 
 impl Scanner {
-
     /*
      * Public methods - Creating a Scanner and staring a scan for tokens
      */
@@ -72,9 +71,11 @@ impl Scanner {
      * Private methods - All the implementation details of how the scanning is done
      */
 
-    /// This method looks at the next char in the source, and takes decisions based on that
+    /// This method looks at the next char in the source, and makes decisions based on that
     fn scan_token(&mut self) {
-        let c = self.advance();
+        let c = self.peek();
+        self.advance();
+
         match c {
             // Single-character tokens.
             '(' => self.add_token(TokenType::LeftParen),
@@ -136,7 +137,7 @@ impl Scanner {
             ' ' | '\r' | '\t' => {}
 
             // Line breaks
-            '\n' => self.line += 1,
+            '\n' => self.next_line(),
 
             // String
             '"' => self.string(),
@@ -158,14 +159,12 @@ impl Scanner {
     }
 
     /*
-     * The large classification scanners, identifier, number and string
+     * The large classification scanners: identifier, number and string
      */
 
     fn identifier(&mut self) {
-        let mut d = self.peek();
-        while self.is_alpha_numeric(d) {
+        while self.is_alpha_numeric(self.peek()) {
             self.advance();
-            d = self.peek();
         }
 
         let text = self.get_text();
@@ -205,7 +204,7 @@ impl Scanner {
         // Try to find the terminating " of the string
         while self.peek() != '"' && !self.is_at_end() {
             if self.peek() == '\n' {
-                self.line += 1;
+                self.next_line();
             }
             self.advance();
         }
@@ -229,37 +228,38 @@ impl Scanner {
      * Small helpers for the scanning
      */
 
-    fn advance(&mut self) -> char {
-        let c = self.get_char();
+    /// Original name: advance
+    fn advance(&mut self) {
         self.current += 1;
-        c
+    }
+
+    fn next_line(&mut self) {
+        self.line += 1;
     }
 
     fn next_matches(&mut self, expected: char) -> bool {
         if self.is_at_end() {
             return false;
         };
-        if self.get_char() != expected {
+        if self.peek() != expected {
             return false;
         }
 
-        self.current += 1;
+        self.advance();
         true
     }
-
 
     /*
      * Small helpers to classify if the current char is alpha or alpha-numeric
      */
 
     fn is_alpha(&self, c: char) -> bool {
-        (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+        c.is_ascii_alphabetic() || c == '_'
     }
 
     fn is_alpha_numeric(&self, c: char) -> bool {
-        self.is_alpha(c) || c.is_ascii_digit()
+        c.is_ascii_alphanumeric() || c == '_'
     }
-
 
     /*
      * Checking that we don't pass the end of the source
@@ -268,7 +268,6 @@ impl Scanner {
     fn is_at_end(&self) -> bool {
         self.current >= self.source.len()
     }
-   
 
     /*
      * Peeking at characters in the source
@@ -287,7 +286,6 @@ impl Scanner {
         }
         self.get_next_char()
     }
-
 
     /*
      * Getting chars or text from the source
@@ -308,8 +306,7 @@ impl Scanner {
         self.source[self.start..self.current].into()
     }
 
-
-    /* 
+    /*
      * Adding tokens
      */
 
