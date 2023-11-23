@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::token::{Token, TokenType};
+use crate::token::{Token, TokenType, Literal};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 
@@ -192,11 +192,7 @@ impl Scanner {
         let text = self.get_text();
         let number = text.parse::<f32>().unwrap();
 
-        // Our current implementation only allows Option<String> to be passed here,
-        // so I'll convert it back to a string to let it pass for now.
-
-        // FIXME: Add support for both string and number literals!
-        self.add_token_object(TokenType::Number, Some(number.to_string()));
+        self.add_token_literal(TokenType::Number, Some(Literal::Number(number)));
     }
 
     fn string(&mut self) {
@@ -220,7 +216,7 @@ impl Scanner {
         let text = &self.get_text();
         let text = &text[1..text.len() - 1];
 
-        self.add_token_object(TokenType::String, Some(text.into()));
+        self.add_token_literal(TokenType::String, Some(Literal::String(text.into())));
     }
 
     /*
@@ -310,10 +306,10 @@ impl Scanner {
      */
 
     fn add_token(&mut self, token_type: TokenType) {
-        self.add_token_object(token_type, None)
+        self.add_token_literal(token_type, None)
     }
 
-    fn add_token_object(&mut self, token_type: TokenType, literal: Option<String>) {
+    fn add_token_literal(&mut self, token_type: TokenType, literal: Option<Literal>) {
         let text = self.get_text();
         let token = Token::new(token_type, text, literal, self.line);
         self.tokens.push(token);
