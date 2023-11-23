@@ -35,3 +35,10 @@ I had to bring in the Option type to handle the Token.literal field, it's typed 
 
 Let's hope that I get back to this soon again! :)
 
+## Chapter 4 - Scanner
+
+When having completed the chapter, and implemented the code, there were quite a lot of small changes that I wanted to do. Refactoring code is a good way to learn both the subject matter, and the code itself, but the Scanner and Token classes are quite easy to understand at this point, and I'd like to keep it that way.
+
+While there is more things we could change, I think I rather continue with the next chapter at this point, as I'm eager to start looking at Chapter 5 - Representing Code!
+
+See you there! :)
