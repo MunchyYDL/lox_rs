@@ -1,14 +1,13 @@
 #![allow(dead_code)]
 
-use lazy_static::*;
-use std::collections::HashMap;
-
 use crate::token::{Token, TokenType};
+use once_cell::sync::Lazy;
+use std::collections::HashMap;
 
 static ZERO_TERMINATED: char = '\0';
 
-lazy_static! {
-    static ref KEYWORDS: HashMap<&'static str, TokenType> = HashMap::from([
+static KEYWORDS: Lazy<HashMap<&'static str, TokenType>> = Lazy::new(|| {
+    HashMap::from([
         ("and", TokenType::And),
         ("class", TokenType::Class),
         ("else", TokenType::Else),
@@ -24,9 +23,9 @@ lazy_static! {
         ("this", TokenType::This),
         ("true", TokenType::True),
         ("var", TokenType::Var),
-        ("while", TokenType::While)
-    ]);
-}
+        ("while", TokenType::While),
+    ])
+});
 
 pub struct Scanner {
     source: String,
