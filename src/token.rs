@@ -1,11 +1,12 @@
 #![allow(dead_code)]
 
 use std::fmt::{self, Display};
+use strum::Display;
 
 #[derive(Debug, Clone)]
 pub enum Literal {
     String(String),
-    Number(f32)
+    Number(f32),
 }
 
 #[derive(Debug, Clone)]
@@ -34,15 +35,20 @@ impl Token {
 
 impl Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{:?} {} {:?}",
-            self.token_type, self.lexeme, self.literal
-        )
+        match self.token_type {
+            TokenType::String | TokenType::Number => write!(
+                f,
+                "{:<10} {:?}",
+                self.token_type,
+                self.literal.as_ref().unwrap()
+            ),
+            TokenType::Eof => write!(f, "{:<10}", self.token_type),
+            _ => write!(f, "{:<10} '{}'", self.token_type, self.lexeme),
+        }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Display, Debug, Clone)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,

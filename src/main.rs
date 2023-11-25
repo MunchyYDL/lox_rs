@@ -65,7 +65,7 @@ fn run(source: String) {
 
     // For now, just print the tokens.
     for token in tokens {
-        println!("{token:?}");
+        println!("Token: {token}");
     }
 }
 
