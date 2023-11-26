@@ -11,7 +11,7 @@ pub enum Literal {
 
 #[derive(Debug, Clone)]
 pub struct Token {
-    token_type: TokenType,
+    pub token_type: TokenType,
     lexeme: String,
     literal: Option<Literal>,
     line: usize,
@@ -48,7 +48,7 @@ impl Display for Token {
     }
 }
 
-#[derive(Display, Debug, Clone)]
+#[derive(Display, Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Single-character tokens.
     LeftParen,

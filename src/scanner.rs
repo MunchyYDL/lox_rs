@@ -52,6 +52,8 @@ impl Scanner {
     }
 
     pub fn scan_tokens(&mut self) -> Vec<Token> {
+        self.tokens = Vec::new();
+
         loop {
             if self.is_at_end() {
                 break;
@@ -314,5 +316,42 @@ impl Scanner {
         let text = self.get_text();
         let token = Token::new(token_type, text, literal, self.line);
         self.tokens.push(token);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_return_eof_from_empty_input() {
+        let mut scanner = Scanner::new("");
+        let tokens = scanner.scan_tokens();
+
+        assert_eq!(tokens.len(), 1);
+        assert!(tokens.last().unwrap().token_type == TokenType::Eof);
+    }
+
+    #[test]
+    fn should_not_return_old_tokens() {
+        let mut scanner = Scanner::new("");
+
+        // Here, calling scan_tokens twice, should
+        // only produce the tokens once
+        let _ = scanner.scan_tokens();
+        let tokens = scanner.scan_tokens();
+
+        assert_eq!(tokens.len(), 1);
+        assert!(tokens.last().unwrap().token_type == TokenType::Eof);
+    }
+
+    #[test]
+    fn should_return_tokens() {
+        let mut scanner = Scanner::new("(2 * 3.14)");
+        let tokens = scanner.scan_tokens();
+
+        assert_eq!(tokens.len(), 6);
+        assert!(tokens.first().unwrap().token_type == TokenType::LeftParen);
+        assert!(tokens.last().unwrap().token_type == TokenType::Eof);
     }
 }
