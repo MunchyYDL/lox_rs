@@ -38,12 +38,12 @@ pub struct Scanner {
 
 impl Scanner {
     /*
-     * Public methods - Creating a Scanner and staring a scan for tokens
+     * Public methods - Creating a Scanner and starting a scan for tokens
      */
 
-    pub fn new(source: String) -> Self {
+    pub fn new(source: impl Into<String>) -> Self {
         Scanner {
-            source,
+            source: source.into(),
             tokens: Vec::new(),
             start: 0,
             current: 0,
@@ -206,7 +206,7 @@ impl Scanner {
         }
 
         if self.is_at_end() {
-            crate::error(self.line, "Unterminated string.".into());
+            crate::error(self.line, "Unterminated string.");
             return;
         }
 

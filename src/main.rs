@@ -69,8 +69,8 @@ fn run(source: String) {
     }
 }
 
-fn error(line: usize, message: String) {
-    report(line, "".into(), message);
+fn error(line: usize, message: impl Into<String>) {
+    report(line, "".into(), message.into());
 }
 
 fn report(line: usize, r#where: String, message: String) {
